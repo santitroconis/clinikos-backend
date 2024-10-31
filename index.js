@@ -17,7 +17,7 @@ const security = new Security();
 app.use(cors());
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://7802b152.clinikos.pages.dev"],
   })
 );
 app.use(express.json());
