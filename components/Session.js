@@ -1,5 +1,5 @@
-import argon2 from "argon2";
-import session from "express-session";
+const argon2 = require("argon2");
+const session = require("express-session");
 
 class Session {
   constructor(app, db) {
@@ -51,4 +51,4 @@ class Session {
   }
 }
 
-export default Session;
+module.exports = Session;

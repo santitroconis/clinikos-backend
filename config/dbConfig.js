@@ -1,4 +1,4 @@
-export const dbConfig = {
+module.exports = {
   user: "postgres",
   host: "localhost",
   password: "postgres",

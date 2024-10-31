@@ -17,4 +17,4 @@ class Security {
   // exeMethod(jsonData) {}
 }
 
-export default Security;
+module.exports = Security;

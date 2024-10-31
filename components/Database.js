@@ -1,5 +1,5 @@
-import { Pool } from "pg";
-import { dbConfig } from "../config/dbConfig.js";
+const { Pool } = require("pg");
+const { dbConfig } = require("../config/dbConfig.js");
 
 class Database {
   constructor(queries) {
@@ -31,4 +31,4 @@ class Database {
   }
 }
 
-export default Database;
+module.exports = Database;
