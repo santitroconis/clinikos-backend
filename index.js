@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const path = require("path");
 const argon2 = require("argon2");
 const app = express();
@@ -13,24 +14,17 @@ const session = new Session(app, db);
 const Security = require("./components/Security");
 const security = new Security();
 
-//
-// app.use(express.static("public"));
-// app.use("/static", express.static("public"));
-
+app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// const start = (req, res) => {
-//   res.sendFile(path.join(__dirname, "public/index.html"));
-// };
-// app.get("/", start);
 app.get("/health", (req, res) => {
   res.send("Server is running");
-});
-//
-
-app.get("/signup", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "signup.html"));
 });
 
 app.post("/login", async (req, res) => {
@@ -73,13 +67,23 @@ app.post("/logout", async (req, res) => {
 
 app.post("/toProcess", async (req, res) => {});
 
+app.get("/test", async (req, res) => {
+  try {
+    res.sendStatus(200);
+    const result = await db.query("SELECT * FROM public.profile");
+    res.send(result.rows);
+  } catch (error) {
+    console.error("Error al obtener los datos:", error);
+    res.status(500).send("Error interno del servidor");
+  }
+});
+
 app.post("/register", async (req, res) => {
   const {
     documentType,
     documentNumber,
     name,
     lastname,
-    // photo,
     email,
     address,
     username,
@@ -117,7 +121,7 @@ app.post("/register", async (req, res) => {
       hashedPassword,
     ]);
 
-    // res.send("User registered");
+    res.send("User registered");
   } catch (error) {
     console.error("Error registering user", error.stack);
     if (!res.headersSent) {
