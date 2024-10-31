@@ -14,12 +14,12 @@ const session = new Session(app, db);
 const Security = require("./components/Security");
 const security = new Security();
 
-app.use(cors());
-app.use(
-  cors({
-    origin: ["http://localhost:5173", "https://7802b152.clinikos.pages.dev"],
-  })
-);
+const corsOptions = {
+  origin: ["http://localhost:5173", "https://clinikos.pages.dev"],
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -67,66 +67,65 @@ app.post("/logout", async (req, res) => {
 
 app.post("/toProcess", async (req, res) => {});
 
+////////////////////////////////////////////////////////////////////////////
+
+// TESTING /////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////
+
 app.get("/test", async (req, res) => {
   try {
-    res.sendStatus(200);
     const result = await db.query("SELECT * FROM public.profile");
-    res.send(result.rows);
+    res.status(200).send(result.rows);
   } catch (error) {
     console.error("Error al obtener los datos:", error);
     res.status(500).send("Error interno del servidor");
   }
 });
 
+app.post("/insert", async (req, res) => {
+  const { text } = req.body;
+  try {
+    const result = await db.query(
+      "INSERT INTO public.profile (profile_na, profile_desc) VALUES ($1, $2);",
+      [text, text]
+    );
+    res.status(200).send(result);
+  } catch (error) {
+    console.error("Error al insertar los datos:", error);
+    res.status(500).send("Error interno del servidor");
+  }
+});
+
+///////////////////////////////////////////////////////////////////////////
+
 app.post("/register", async (req, res) => {
   const {
-    documentType,
-    documentNumber,
-    name,
-    lastname,
-    email,
-    address,
+    documentTypeId,
+    documentNu,
+    personNa,
+    personLna,
+    personEml,
+    personDir,
     username,
     password,
   } = req.body;
-
-  if (
-    !username ||
-    !password ||
-    !documentType ||
-    !documentNumber ||
-    !name ||
-    !lastname ||
-    !email
-  ) {
-    return res.status(400).send("Invalid data");
-  }
-
   try {
-    const checkUser = await db.query("checkUser", [username]);
-
-    if (checkUser.rows.length) {
-      return res.status(400).send("User already exists");
-    }
-
     const hashedPassword = await argon2.hash(password);
     await db.query("register", [
-      documentType,
-      documentNumber,
-      name,
-      lastname,
-      email,
-      address,
+      documentTypeId,
+      documentNu,
+      personNa,
+      personLna,
+      personEml,
+      personDir,
       username,
       hashedPassword,
     ]);
-
-    res.send("User registered");
+    res.status(200).send("User registered successfully");
   } catch (error) {
-    console.error("Error registering user", error.stack);
-    if (!res.headersSent) {
-      res.status(500).send("Internal Server Error");
-    }
+    console.error("Error registering user", error);
+    res.status(500).send("Internal server error");
   }
 });
 
