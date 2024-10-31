@@ -2,7 +2,7 @@ module.exports = {
   dbConfig: {
     user: "postgres",
     host: "localhost",
-    password: "postgres",
+    password: "davidpaz06",
     database: "test",
     port: 5432,
     ssl: false,
