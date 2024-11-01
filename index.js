@@ -85,6 +85,9 @@ app.get("/test", async (req, res) => {
 
 app.post("/insert", async (req, res) => {
   const { text } = req.body;
+
+  console.log(req.body);
+
   try {
     const result = await db.query(
       "INSERT INTO public.profile (profile_na, profile_desc) VALUES ($1, $2);",
