@@ -104,7 +104,7 @@ app.post("/insert", async (req, res) => {
 
 app.post("/register", async (req, res) => {
   const {
-    documentTypeId,
+    documentType,
     documentNu,
     personNa,
     personLna,
@@ -113,18 +113,18 @@ app.post("/register", async (req, res) => {
     username,
     password,
   } = req.body;
+
   try {
     const hashedPassword = await argon2.hash(password);
-    await db.query("register", [
-      documentTypeId,
-      documentNu,
-      personNa,
-      personLna,
-      personEml,
-      personDir,
-      username,
-      hashedPassword,
-    ]);
+    await db.transaction(
+      ["insertDocument", "insertPerson", "insertUser"],
+      [
+        [documentType, documentNu],
+        [personNa, personLna, personEml, personDir, null],
+        [username, hashedPassword, null],
+      ]
+    );
+
     res.status(200).send("User registered successfully");
   } catch (error) {
     console.error("Error registering user", error);
