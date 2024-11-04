@@ -3,6 +3,7 @@ const cors = require("cors");
 const path = require("path");
 const argon2 = require("argon2");
 const app = express();
+const ht = require("./config/health.json");
 
 const Database = require("./components/Database");
 const queries = require("./config/queries.json");
@@ -24,7 +25,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.get("/health", (req, res) => {
-  res.send("Server is running");
+  res.send(ht.healthText);
 });
 
 app.post("/login", async (req, res) => {
