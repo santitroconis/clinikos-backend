@@ -1,7 +1,7 @@
 {
   "login": "SELECT * FROM public.user WHERE username = $1",
   "checkUser": "SELECT * FROM public.user WHERE username = $1",
-  "insertDocument": "insert into document (document_type_id, document_nu) values ($1, $2) returning document_id",
+  "insertDocument": "INSERT INTO document (document_type_id, document_nu) VALUES ($1, $2) RETURNING document_id",
   "insertPerson": "INSERT INTO person (person_na, person_lna, person_eml, person_dir, document_id) VALUES ($1, $2, $3, $4, $5) RETURNING person_id",
   "insertUser": "INSERT INTO public.user (username, password, person_id) VALUES ($1, $2, $3)",
   "loadProfile": "SELECT * FROM public.user WHERE username = $1"

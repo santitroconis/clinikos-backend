@@ -67,38 +67,6 @@ app.post("/logout", async (req, res) => {
 
 app.post("/toProcess", async (req, res) => {});
 
-////////////////////////////////////////////////////////////////////////////
-
-// TESTING /////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////////////
-
-app.get("/test", async (req, res) => {
-  try {
-    const result = await db.query("SELECT * FROM public.profile");
-    res.status(200).send(result.rows);
-  } catch (error) {
-    console.error("Error al obtener los datos:", error);
-    res.status(500).send("Error interno del servidor");
-  }
-});
-
-app.post("/insert", async (req, res) => {
-  const { text } = req.body;
-  try {
-    const result = await db.query(
-      "INSERT INTO public.profile (profile_na, profile_desc) VALUES ($1, $2);",
-      [text, text]
-    );
-    res.status(200).send(result);
-  } catch (error) {
-    console.error("Error al insertar los datos:", error);
-    res.status(500).send("Error interno del servidor");
-  }
-});
-
-///////////////////////////////////////////////////////////////////////////
-
 app.post("/register", async (req, res) => {
   const {
     documentType,
@@ -112,6 +80,11 @@ app.post("/register", async (req, res) => {
   } = req.body;
 
   try {
+    const checkUser = await db.query("checkUser", [username]);
+
+    if (checkUser.rows.length) {
+      return res.status(400).send("User already exists");
+    }
     const hashedPassword = await argon2.hash(password);
     await db.transaction(
       ["insertDocument", "insertPerson", "insertUser"],
@@ -119,6 +92,10 @@ app.post("/register", async (req, res) => {
         [documentType, documentNu],
         [personNa, personLna, personEml, personDir, null],
         [username, hashedPassword, null],
+      ],
+      [
+        { sourceIndex: 0, targetIndex: 1, targetParamIndex: 4 },
+        { sourceIndex: 1, targetIndex: 2, targetParamIndex: 2 },
       ]
     );
 

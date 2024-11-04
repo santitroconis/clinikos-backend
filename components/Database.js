@@ -20,7 +20,7 @@ class Database {
     const client = await this.pool.connect();
     try {
       const query = this.queries[queryName] || queryName;
-      res = await client.query(query, params);
+      const res = await client.query(query, params);
       return res;
     } catch (err) {
       console.error(`Error executing query:`, err);
@@ -30,18 +30,27 @@ class Database {
     }
   }
 
-  async transaction(queryArray, paramsArray) {
+  async transaction(queryArray, paramsArray, dependencies = []) {
     const client = await this.pool.connect();
     try {
       await client.query("BEGIN");
+
       let results = [];
       for (let i = 0; i < queryArray.length; i++) {
         const query = this.queries[queryArray[i]] || queryArray[i];
         const params = paramsArray[i];
-        console.log(`Ejecutando consulta: ${query}`);
-        console.log(`Con parámetros: ${JSON.stringify(params)}`);
         const res = await client.query(query, params);
         results.push(res);
+
+        if (res.rows[0]) {
+          let id = Object.values(res.rows[0])[0];
+          dependencies.forEach((dep) => {
+            if (dep.sourceIndex === i) {
+              const targetParams = paramsArray[dep.targetIndex];
+              targetParams[dep.targetParamIndex] = id;
+            }
+          });
+        }
       }
       await client.query("COMMIT");
       return results;
