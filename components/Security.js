@@ -1,6 +1,7 @@
 class Security {
   constructor() {
     this.permissionMethod = new Map();
+    // this.loadPermissions(); //esto va a dar error hasta que se termine el componente
   }
 
   loadPermissions() {
