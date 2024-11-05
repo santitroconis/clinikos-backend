@@ -4,6 +4,7 @@ const path = require("path");
 const argon2 = require("argon2");
 const app = express();
 const corsConfig = require("./config/corsConfig");
+const ht = require("./config/health.json");
 
 const Database = require("./components/Database");
 const queries = require("./config/queries.json");
@@ -15,17 +16,12 @@ const session = new Session(app, db);
 const Security = require("./components/Security");
 const security = new Security();
 
-// const corsOptions = {
-//   origin: ["http://localhost:5173", "https://clinikos.pages.dev"],
-//   optionsSuccessStatus: 200,
-// };
-
 app.use(cors(corsConfig));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.get("/health", (req, res) => {
-  res.send("Server is running");
+  res.send(ht.healthText);
 });
 
 app.post("/login", async (req, res) => {
