@@ -34,6 +34,7 @@ app.post("/login", async (req, res) => {
   if (!session.sessionExist(req)) {
     const result = await session.createSession(req);
     if (result.success) {
+      console.log("Sesión creada con éxito :", result.sessionData);
       return res.sendStatus(200);
     } else {
       return res.status(400).send(result.message);
@@ -44,6 +45,7 @@ app.post("/login", async (req, res) => {
 });
 
 app.post("/logout", async (req, res) => {
+  console.log(session.sessionExist(req));
   try {
     if (session.sessionExist(req)) {
       req.session.destroy((err) => {
@@ -51,7 +53,7 @@ app.post("/logout", async (req, res) => {
           console.error("Error al destruir la sesión:", err);
           return res.status(500).send("Error al cerrar la sesión");
         }
-        res.sendFile(path.join(__dirname, "public/home.html"));
+        res.sendStatus(200);
       });
     } else {
       res.status(400).send("No hay sesión activa");

@@ -43,7 +43,7 @@ class Session {
       }
 
       req.session.userId = user.rows[0].user_id;
-      return { success: true };
+      return { success: true, sessionData: req.session };
     } catch (error) {
       console.error("Login error", error.stack);
       return { success: false, message: "Internal Server Error" };
