@@ -1,6 +1,5 @@
 const express = require("express");
 const cors = require("cors");
-const path = require("path");
 const argon2 = require("argon2");
 const app = express();
 const corsConfig = require("./config/corsConfig");
@@ -14,7 +13,7 @@ const Session = require("./components/Session");
 const session = new Session(app, db);
 
 const Security = require("./components/Security");
-const security = new Security();
+const security = new Security(db);
 
 app.use(cors(corsConfig));
 app.use(express.json());

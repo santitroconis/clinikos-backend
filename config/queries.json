@@ -1,8 +1,15 @@
 {
   "login": "SELECT * FROM public.user WHERE username = $1",
+
   "checkUser": "SELECT * FROM public.user WHERE username = $1",
+
   "insertDocument": "INSERT INTO document (document_type_id, document_nu) VALUES ($1, $2) RETURNING document_id",
+
   "insertPerson": "INSERT INTO person (person_na, person_lna, person_eml, person_dir, document_id) VALUES ($1, $2, $3, $4, $5) RETURNING person_id",
+
   "insertUser": "INSERT INTO public.user (username, password, person_id) VALUES ($1, $2, $3)",
-  "loadProfile": "SELECT * FROM public.user WHERE username = $1"
+
+  "loadProfile": "SELECT * FROM public.user WHERE username = $1",
+
+  "getPermissions": "SELECT p.profile_id, m.method_na, o.object_na FROM public.permission_method pm JOIN public.profile p ON pm.profile_id = p.profile_id JOIN method m ON pm.method_id = m.method_id JOIN object o ON m.object_id = o.object_id"
 }

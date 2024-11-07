@@ -1,32 +1,31 @@
 class Security {
-  constructor() {
+  constructor(db) {
+    this.db = db;
     this.permissionMethod = new Map();
-    // this.loadPermissions(); //esto va a dar error hasta que se termine el componente
+    this.loadPermissions();
   }
 
-  loadPermissions() {
-    db.query(/*QUERY PARA TRAER LOS PERMISOS */)
-      .then((res) => {
-        if (res.rows.length === 0) {
-          console.log("No se encontraron permisos.");
-        }
-        res.rows.forEach((element) => {
-          let key =
-            element.profile_id +
-            "_" +
-            element.method_na +
-            "_" +
-            element.object_na;
-          console.log("Cargando permiso para la clave:", key);
+  async loadPermissions() {
+    try {
+      const res = await this.db.query("getPermissions");
+      if (res.rows.length === 0) {
+        console.log("No permissions found");
+      }
+      res.rows.forEach((element) => {
+        let key =
+          element.profile_id +
+          "_" +
+          element.method_na +
+          "_" +
+          element.object_na;
+        console.log("Loading permission for key:", key);
 
-          // Guardando el permiso en el Map
-          this.permission.set(key, true);
-        });
-        console.log(this.permission);
-      })
-      .catch((error) => {
-        console.error("Error cargando permisos:", error);
+        this.permissionMethod.set(key, true);
       });
+      console.log(this.permissionMethod);
+    } catch (error) {
+      console.error("Error:", error);
+    }
   }
 
   hasPermission(req) {
