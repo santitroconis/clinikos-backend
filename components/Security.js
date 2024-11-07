@@ -39,9 +39,9 @@ class Security {
 
   async exeMethod(data) {
     try {
-      const BO = require(`../Business/${data.objectName}`);
-      const boInstance = new BO(this.db);
-      const method = boInstance[data.methodName];
+      let BO = require(`../Business/${data.objectName}`);
+      let boInstance = new BO(this.db);
+      let method = boInstance[data.methodName];
 
       if (typeof method === "function") {
         return await method.call(boInstance, data.params);
