@@ -33,13 +33,13 @@ app.post("/login", async (req, res) => {
   if (!session.sessionExist(req)) {
     const result = await session.createSession(req);
     if (result.success) {
-      console.log("Sesión creada con éxito :", result.sessionData);
+      console.log("Succesful sign in :", result.sessionData);
       return res.sendStatus(200);
     } else {
       return res.status(400).send(result.message);
     }
   } else {
-    return res.status(400).send("La sesion ya existe");
+    return res.status(400).send("Session already exists");
   }
 });
 
@@ -49,21 +49,34 @@ app.post("/logout", async (req, res) => {
     if (session.sessionExist(req)) {
       req.session.destroy((err) => {
         if (err) {
-          console.error("Error al destruir la sesión:", err);
-          return res.status(500).send("Error al cerrar la sesión");
+          console.error("Error destroying session:", err);
+          return res.status(500).send("Log out error");
         }
         res.sendStatus(200);
       });
     } else {
-      res.status(400).send("No hay sesión activa");
+      res.status(400).send("No active session");
     }
   } catch (error) {
-    console.error("Error en el proceso de cierre de sesión:", error);
-    res.status(500).send("Error interno del servidor");
+    console.error("Log out error:", error);
+    res.status(500).send("Internal server error");
   }
 });
 
-app.post("/toProcess", async (req, res) => {});
+app.post("/toProcess", async (req, res) => {
+  if (!session.sessionExist(req)) {
+    return res.status(401).send("Sign in required");
+  }
+
+  const data = {
+    userProfile: req.session.profileId,
+    methodName: req.body.methodName,
+    objectName: req.body.objectName,
+    params: req.body.params,
+  };
+
+  security.exeMethod(data);
+});
 
 app.post("/register", async (req, res) => {
   const {

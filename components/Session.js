@@ -43,6 +43,8 @@ class Session {
       }
 
       req.session.userId = user.rows[0].user_id;
+      req.session.username = user.rows[0].username;
+      req.session.profileId = user.rows[0].profile_id;
       return { success: true, sessionData: req.session };
     } catch (error) {
       console.error("Login error", error.stack);

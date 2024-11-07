@@ -37,7 +37,24 @@ class Security {
     }
   }
 
-  // exeMethod(jsonData) {}
+  async exeMethod(data) {
+    try {
+      const BO = require(`../Business/${data.objectName}`);
+      const boInstance = new BO(this.db);
+      const method = boInstance[data.methodName];
+
+      if (typeof method === "function") {
+        return await method.call(boInstance, data.params);
+      } else {
+        throw new Error(
+          `Method ${data.methodName} not found in ${data.objectName}`
+        );
+      }
+    } catch (error) {
+      console.error("Error executing method:", error);
+      throw error;
+    }
+  }
 }
 
 module.exports = Security;
