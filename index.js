@@ -33,7 +33,6 @@ app.post("/login", async (req, res) => {
   if (!session.sessionExist(req)) {
     const result = await session.createSession(req);
     if (result.success) {
-      console.log("Succesful sign in :", result.sessionData);
       return res.sendStatus(200);
     } else {
       return res.status(400).send(result.message);
@@ -44,7 +43,6 @@ app.post("/login", async (req, res) => {
 });
 
 app.post("/logout", async (req, res) => {
-  console.log(session.sessionExist(req));
   try {
     if (session.sessionExist(req)) {
       req.session.destroy((err) => {
