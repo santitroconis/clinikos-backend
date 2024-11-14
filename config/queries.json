@@ -1,5 +1,5 @@
 {
-  "login": "SELECT * FROM public.user WHERE username = $1",
+  "login": "SELECT * FROM public.user u JOIN user_profile up ON u.user_id = up.user_id WHERE username = $1",
 
   "checkUser": "SELECT * FROM public.user WHERE username = $1",
 

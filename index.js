@@ -1,8 +1,10 @@
 const express = require("express");
 const cors = require("cors");
+
 const argon2 = require("argon2");
 const app = express();
 const corsConfig = require("./config/corsConfig");
+const path = require("path");
 const ht = require("./config/health.json");
 
 const Database = require("./components/Database");
@@ -73,7 +75,16 @@ app.post("/toProcess", async (req, res) => {
     params: req.body.params,
   };
 
-  security.exeMethod(data);
+  console.log("Data to process:", data);
+
+  if (security.hasPermission(data)) {
+    const result = security.executeMethod(data);
+    console.log("Resultado de la ejecución del método:", result);
+  } else {
+    return res.status(403).send({ msg: "No tiene permiso." });
+  }
+
+  // security.exeMethod(data);
 });
 
 app.post("/register", async (req, res) => {
