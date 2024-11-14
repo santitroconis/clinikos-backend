@@ -75,16 +75,11 @@ app.post("/toProcess", async (req, res) => {
     params: req.body.params,
   };
 
-  console.log("Data to process:", data);
-
   if (security.hasPermission(data)) {
-    const result = security.executeMethod(data);
-    console.log("Resultado de la ejecución del método:", result);
+    security.exeMethod(data);
   } else {
     return res.status(403).send({ msg: "No tiene permiso." });
   }
-
-  // security.exeMethod(data);
 });
 
 app.post("/register", async (req, res) => {

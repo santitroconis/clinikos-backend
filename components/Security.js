@@ -29,7 +29,7 @@ class Security {
   }
 
   hasPermission(req) {
-    let key = `${req.session.profileId}_${req.body.objectName}_${req.body.methodName}`;
+    let key = `${req.userProfile}_${req.methodName}_${req.objectName}`;
     if (this.permissionMethod.has(key)) {
       return this.permissionMethod.get(key);
     } else {
