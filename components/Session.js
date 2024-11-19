@@ -31,7 +31,7 @@ class Session {
       const user = await this.db.query("login", [username]);
 
       if (!user.rows.length) {
-        return { success: false, message: "Datos incorrectos" };
+        return { success: false, message: "Invalid Data" };
       }
 
       const validPassword = await this.argon2.verify(
@@ -39,12 +39,13 @@ class Session {
         password
       );
       if (!validPassword) {
-        return { success: false, message: "Datos incorrectos" };
+        return { success: false, message: "Invalid Data" };
       }
 
       req.session.userId = user.rows[0].user_id;
       req.session.username = user.rows[0].username;
       req.session.profileId = user.rows[0].profile_id;
+
       return { success: true, sessionData: req.session };
     } catch (error) {
       console.error("Login error", error.stack);

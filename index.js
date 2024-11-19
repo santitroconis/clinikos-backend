@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
-
 const argon2 = require("argon2");
+
 const app = express();
 const corsConfig = require("./config/corsConfig");
 const path = require("path");
@@ -25,6 +25,52 @@ app.get("/health", (req, res) => {
   res.send(ht.healthText);
 });
 
+app.post("/register", async (req, res) => {
+  const {
+    documentType,
+    documentNu,
+    personNa,
+    personLna,
+    personPho,
+    personEml,
+    personDir,
+    username,
+    password,
+    profileId,
+  } = req.body;
+
+  try {
+    const checkUser = await db.query("checkUser", [username]);
+
+    if (checkUser.rows.length) {
+      return res.status(400).send("User already exists");
+    }
+    const hashedPassword = await argon2.hash(password);
+    await db.transaction(
+      ["insertDocument", "insertPerson", "insertUser", "insertUserProfile"],
+      [
+        [documentType, documentNu],
+        [personNa, personLna, personPho, personEml, personDir, null],
+        [username, hashedPassword, null],
+        [null, profileId],
+      ],
+      [
+        { sourceIndex: 0, targetIndex: 1, targetParamIndex: 5 },
+        { sourceIndex: 1, targetIndex: 2, targetParamIndex: 2 },
+        { sourceIndex: 2, targetIndex: 3, targetParamIndex: 0 },
+      ]
+    );
+
+    await session.createSession(req);
+    await session.sessionExist(req);
+
+    res.sendStatus(200);
+  } catch (error) {
+    console.error("Error registering user", error);
+    res.status(500).send("Internal server error");
+  }
+});
+
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
@@ -45,6 +91,11 @@ app.post("/login", async (req, res) => {
 });
 
 app.post("/logout", async (req, res) => {
+  console.log("Log out request");
+  console.log(req.session);
+  console.log("");
+
+  console.log("session exists", session.sessionExist(req));
   try {
     if (session.sessionExist(req)) {
       req.session.destroy((err) => {
@@ -79,45 +130,6 @@ app.post("/toProcess", async (req, res) => {
     security.exeMethod(data);
   } else {
     return res.status(403).send({ msg: "No tiene permiso." });
-  }
-});
-
-app.post("/register", async (req, res) => {
-  const {
-    documentType,
-    documentNu,
-    personNa,
-    personLna,
-    personEml,
-    personDir,
-    username,
-    password,
-  } = req.body;
-
-  try {
-    const checkUser = await db.query("checkUser", [username]);
-
-    if (checkUser.rows.length) {
-      return res.status(400).send("User already exists");
-    }
-    const hashedPassword = await argon2.hash(password);
-    await db.transaction(
-      ["insertDocument", "insertPerson", "insertUser"],
-      [
-        [documentType, documentNu],
-        [personNa, personLna, personEml, personDir, null],
-        [username, hashedPassword, null],
-      ],
-      [
-        { sourceIndex: 0, targetIndex: 1, targetParamIndex: 4 },
-        { sourceIndex: 1, targetIndex: 2, targetParamIndex: 2 },
-      ]
-    );
-
-    res.status(200).send("User registered successfully");
-  } catch (error) {
-    console.error("Error registering user", error);
-    res.status(500).send("Internal server error");
   }
 });
 
