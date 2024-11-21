@@ -1,7 +1,5 @@
 class Appointment {
-  constructor(db) {
-    this.db = db;
-  }
+  constructor() {}
 
   async createAppointment(params) {
     console.log("Creating appointment with params:", params);
