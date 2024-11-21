@@ -4,18 +4,17 @@ const argon2 = require("argon2");
 
 const app = express();
 const corsConfig = require("./config/corsConfig");
-const path = require("path");
 const ht = require("./config/health.json");
 
 const Database = require("./components/Database");
 const queries = require("./config/queries.json");
-const db = new Database(queries);
+global.db = new Database(queries);
 
 const Session = require("./components/Session");
-const session = new Session(app, db);
+const session = new Session(app);
 
 const Security = require("./components/Security");
-const security = new Security(db);
+const security = new Security();
 
 app.use(cors(corsConfig));
 app.use(express.json());

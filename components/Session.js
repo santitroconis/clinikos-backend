@@ -2,8 +2,7 @@ const argon2 = require("argon2");
 const session = require("express-session");
 
 class Session {
-  constructor(app, db) {
-    this.db = db;
+  constructor(app) {
     this.argon2 = argon2;
     this.session = session;
     app.use(
@@ -28,7 +27,7 @@ class Session {
     const { username, password } = req.body;
 
     try {
-      const user = await this.db.query("login", [username]);
+      const user = await db.query("login", [username]);
 
       if (!user.rows.length) {
         return { success: false, message: "Invalid Data" };

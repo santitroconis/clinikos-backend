@@ -1,13 +1,12 @@
 class Security {
-  constructor(db) {
-    this.db = db;
+  constructor() {
     this.permissionMethod = new Map();
     this.loadPermissions();
   }
 
   async loadPermissions() {
     try {
-      const res = await this.db.query("getPermissions");
+      const res = await db.query("getPermissions");
       if (res.rows.length === 0) {
         console.log("No permissions found");
       }
@@ -40,7 +39,7 @@ class Security {
   async exeMethod(data) {
     try {
       let BO = require(`../Business/${data.objectName}`);
-      let boInstance = new BO(this.db);
+      let boInstance = new BO(db);
       let method = boInstance[data.methodName];
 
       if (typeof method === "function") {
