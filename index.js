@@ -81,7 +81,7 @@ app.post("/login", async (req, res) => {
     const result = await session.createSession(req);
     if (result.success) {
       console.log("la sesion es", req.session);
-      return res.sendStatus(200);
+      return res.status(200).json({ token: result.token });
     } else {
       return res.status(400).send(result.message);
     }

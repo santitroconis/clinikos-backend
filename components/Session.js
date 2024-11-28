@@ -13,14 +13,13 @@ class Session {
         resave: false,
         saveUninitialized: true,
         cookie: {
+          httpOnly: true,
           maxAge: 1800000,
           secure: false,
           sameSite: true,
         },
       })
     );
-
-    console.log(process.env.SESSION_SECRET);
   }
 
   sessionExist(req) {
@@ -50,28 +49,20 @@ class Session {
     }
   }
 
-  async createSession(req) {
+  async createSession(req, res) {
     const user = await this.verifyUser(req);
-    // console.log(user);
     try {
-      const token = jwt.sign(
-        {
-          userId: user.rows[0].user_id,
-          username: user.rows[0].username,
-          profileId: user.rows[0].profile,
-        },
-        process.env.JWT_SECRET,
-        { expiresIn: "30m" }
-      );
-      req.session.token = token;
       req.session.userId = user.rows[0].user_id;
+      req.session.username = user.rows[0].username;
+      req.session.profileId = user.rows[0].profile_id;
 
-      return { success: true, sessionData: req.session };
+      return {
+        success: true,
+        sessionData: req.session,
+      };
     } catch (error) {
       console.error("Login error", error.stack);
       return { success: false, message: error.message };
-    } finally {
-      console.log(this.sessionExist(req));
     }
   }
 }
