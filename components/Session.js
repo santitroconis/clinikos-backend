@@ -1,5 +1,7 @@
 const argon2 = require("argon2");
 const session = require("express-session");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
 class Session {
   constructor(app) {
@@ -7,7 +9,7 @@ class Session {
     this.session = session;
     app.use(
       this.session({
-        secret: "ufwx2335419ABXZ",
+        secret: process.env.SESSION_SECRET,
         resave: false,
         saveUninitialized: true,
         cookie: {
@@ -17,15 +19,16 @@ class Session {
         },
       })
     );
+
+    console.log(process.env.SESSION_SECRET);
   }
 
   sessionExist(req) {
     return req.session && req.session.userId ? true : false;
   }
 
-  async createSession(req) {
+  async verifyUser(req) {
     const { username, password } = req.body;
-
     try {
       const user = await db.query("login", [username]);
 
@@ -40,15 +43,35 @@ class Session {
       if (!validPassword) {
         return { success: false, message: "Invalid Data" };
       }
+      return user;
+    } catch (error) {
+      console.error("Login error", error.stack);
+      return { success: false, message: "Internal Server Error" };
+    }
+  }
 
+  async createSession(req) {
+    const user = await this.verifyUser(req);
+    // console.log(user);
+    try {
+      const token = jwt.sign(
+        {
+          userId: user.rows[0].user_id,
+          username: user.rows[0].username,
+          profileId: user.rows[0].profile,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "30m" }
+      );
+      req.session.token = token;
       req.session.userId = user.rows[0].user_id;
-      req.session.username = user.rows[0].username;
-      req.session.profileId = user.rows[0].profile_id;
 
       return { success: true, sessionData: req.session };
     } catch (error) {
       console.error("Login error", error.stack);
-      return { success: false, message: "Internal Server Error" };
+      return { success: false, message: error.message };
+    } finally {
+      console.log(this.sessionExist(req));
     }
   }
 }

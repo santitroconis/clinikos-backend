@@ -17,11 +17,11 @@ class Security {
           element.method_na +
           "_" +
           element.object_na;
-        console.log("Loading permission for key:", key);
+        // console.log("Loading permission for key:", key);
 
         this.permissionMethod.set(key, true);
       });
-      console.log(this.permissionMethod);
+      // console.log(this.permissionMethod);
     } catch (error) {
       console.error("Error:", error);
     }
