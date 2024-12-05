@@ -3,9 +3,7 @@
 
   "checkUser": "SELECT * FROM public.user WHERE username = $1",
 
-  "insertDocument": "INSERT INTO document (document_type_id, document_nu) VALUES ($1, $2) RETURNING document_id",
-
-  "insertPerson": "INSERT INTO person (person_na, person_lna, person_pho, person_eml, person_dir, document_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING person_id",
+  "insertPerson": "INSERT INTO person (document_type, document_number, first_name,  last_name, email, phone, address ) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING person_id",
 
   "insertUser": "INSERT INTO public.user (username, password, person_id) VALUES ($1, $2, $3)  RETURNING user_id",
 
@@ -13,5 +11,9 @@
 
   "loadProfile": "SELECT * FROM public.user WHERE username = $1",
 
-  "getPermissions": "SELECT p.profile_id, m.method_na, o.object_na FROM public.permission_method pm JOIN public.profile p ON pm.profile_id = p.profile_id JOIN method m ON pm.method_id = m.method_id JOIN object o ON m.object_id = o.object_id"
+  "getPermissions": "SELECT p.profile_id, m.method_na, o.object_na FROM public.permission_method pm JOIN public.profile p ON pm.profile_id = p.profile_id JOIN method m ON pm.method_id = m.method_id JOIN object o ON m.object_id = o.object_id",
+
+  "getPersonByDocument": "SELECT person_na, person_lna FROM person p JOIN document d ON p.document_id = d.document_id WHERE d.document_nu = $1 LIMIT 1",
+
+  "createAppointment": "insert into appointment (appointment_hr, appointment_dt, person_id, department_id) values ($1, $2, $3, $4)"
 }

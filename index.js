@@ -27,12 +27,12 @@ app.get("/health", (req, res) => {
 app.post("/register", async (req, res) => {
   const {
     documentType,
-    documentNu,
-    personNa,
-    personLna,
-    personPho,
-    personEml,
-    personDir,
+    documentNumber,
+    firstName,
+    lastName,
+    email,
+    phone,
+    address,
     username,
     password,
     profileId,
@@ -46,17 +46,23 @@ app.post("/register", async (req, res) => {
     }
     const hashedPassword = await argon2.hash(password);
     await db.transaction(
-      ["insertDocument", "insertPerson", "insertUser", "insertUserProfile"],
+      ["insertPerson", "insertUser", "insertUserProfile"],
       [
-        [documentType, documentNu],
-        [personNa, personLna, personPho, personEml, personDir, null],
+        [
+          documentType,
+          documentNumber,
+          firstName,
+          lastName,
+          phone,
+          email,
+          address,
+        ],
         [username, hashedPassword, null],
         [null, profileId],
       ],
       [
-        { sourceIndex: 0, targetIndex: 1, targetParamIndex: 5 },
-        { sourceIndex: 1, targetIndex: 2, targetParamIndex: 2 },
-        { sourceIndex: 2, targetIndex: 3, targetParamIndex: 0 },
+        { sourceIndex: 0, targetIndex: 1, targetParamIndex: 2 },
+        { sourceIndex: 1, targetIndex: 2, targetParamIndex: 0 },
       ]
     );
 
@@ -80,7 +86,6 @@ app.post("/login", async (req, res) => {
   if (!session.sessionExist(req)) {
     const result = await session.createSession(req);
     if (result.success) {
-      console.log("la sesion es", req.session);
       return res.status(200).json({ token: result.token });
     } else {
       return res.status(400).send(result.message);
