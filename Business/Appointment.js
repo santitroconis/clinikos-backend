@@ -4,17 +4,17 @@ class Appointment {
   async createAppointment(params) {
     try {
       const person = await db.query("getPersonByDocument", [
-        params.document_nu,
+        params.document_number,
       ]);
 
       const result = await db.query("createAppointment", [
-        params.appointment_hr,
-        params.appointment_dt,
+        params.hour,
+        params.date,
         person.rows[0].person_id,
-        params.department_de,
+        params.department,
       ]);
-      console.log("Person:", person.rows[0]);
-      console.log(person.rows[0].person_na);
+
+      console.log(result);
     } catch (error) {
       console.error("Error:", error);
       throw error;

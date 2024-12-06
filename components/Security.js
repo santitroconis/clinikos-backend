@@ -1,7 +1,7 @@
 class Security {
   constructor() {
     this.permissionMethod = new Map();
-    // this.loadPermissions();
+    this.loadPermissions();
   }
 
   async loadPermissions() {
@@ -14,13 +14,13 @@ class Security {
         let key =
           element.profile_id +
           "_" +
-          element.method_na +
+          element.method_name +
           "_" +
-          element.object_na;
+          element.object_name;
 
         this.permissionMethod.set(key, true);
       });
-      console.log(this.permissionMethod);
+      // console.log(this.permissionMethod);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -42,7 +42,8 @@ class Security {
       let method = boInstance[data.methodName];
 
       if (typeof method === "function") {
-        return await method.call(boInstance, data.params);
+        const res = await method.call(boInstance, data.params);
+        return res;
       } else {
         throw new Error(
           `Method ${data.methodName} not found in ${data.objectName}`

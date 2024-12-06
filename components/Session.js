@@ -1,6 +1,5 @@
 const argon2 = require("argon2");
 const session = require("express-session");
-const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 class Session {

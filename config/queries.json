@@ -9,11 +9,15 @@
 
   "insertUserProfile": "INSERT INTO user_profile (user_id, profile_id) VALUES ($1, $2)",
 
+  "insertDoctor": "INSERT INTO doctor (person_id) VALUES ($1)",
+
   "loadProfile": "SELECT * FROM public.user WHERE username = $1",
 
-  "getPermissions": "SELECT p.profile_id, m.method_na, o.object_na FROM public.permission_method pm JOIN public.profile p ON pm.profile_id = p.profile_id JOIN method m ON pm.method_id = m.method_id JOIN object o ON m.object_id = o.object_id",
+  "getPermissions": "SELECT p.profile_id, m.method_name, o.object_name FROM public.permission_method pm JOIN public.profile p ON pm.profile_id = p.profile_id JOIN method m ON pm.method_id = m.method_id JOIN object o ON m.object_id = o.object_id",
 
-  "getPersonByDocument": "SELECT person_na, person_lna FROM person p JOIN document d ON p.document_id = d.document_id WHERE d.document_nu = $1 LIMIT 1",
+  "getPersonByDocument": "SELECT person_id FROM person WHERE document_number = $1",
 
-  "createAppointment": "insert into appointment (appointment_hr, appointment_dt, person_id, department_id) values ($1, $2, $3, $4)"
+  "createAppointment": "insert into appointment (appointment_hour, appointment_date, person_id, department_id) values ($1, $2, $3, $4)",
+
+  "getMenus": "select role, menu_name from permission_menu pm join menu m on pm.menu_id = m.menu_id join profile p on pm.profile_id = p.profile_id where p.profile_id = $1"
 }

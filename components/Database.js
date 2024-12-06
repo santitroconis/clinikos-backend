@@ -1,5 +1,6 @@
 const { Pool } = require("pg");
 const { dbConfig } = require("../config/dbConfig");
+require("dotenv").config();
 
 class Database {
   constructor(queries) {

@@ -1,8 +1,9 @@
 class Menu {
   constructor() {}
 
-  static async getMenuItems(params) {
-    console.log("Menu name", params);
+  async getMenus(params) {
+    const menus = await db.query("getMenus", [params.userProfile]);
+    return menus.rows;
   }
 }
 

@@ -45,29 +45,41 @@ app.post("/register", async (req, res) => {
       return res.status(400).send("User already exists");
     }
     const hashedPassword = await argon2.hash(password);
-    await db.transaction(
-      ["insertPerson", "insertUser", "insertUserProfile"],
+    const queryArray = ["insertPerson", "insertUser", "insertUserProfile"];
+    const paramsArray = [
       [
-        [
-          documentType,
-          documentNumber,
-          firstName,
-          lastName,
-          phone,
-          email,
-          address,
-        ],
-        [username, hashedPassword, null],
-        [null, profileId],
+        documentType,
+        documentNumber,
+        firstName,
+        lastName,
+        phone,
+        email,
+        address,
       ],
-      [
-        { sourceIndex: 0, targetIndex: 1, targetParamIndex: 2 },
-        { sourceIndex: 1, targetIndex: 2, targetParamIndex: 0 },
-      ]
-    );
+      [username, hashedPassword, null],
+      [null, profileId],
+    ];
+    const dependencies = [
+      { sourceIndex: 0, targetIndex: 1, targetParamIndex: 2 },
+      { sourceIndex: 1, targetIndex: 2, targetParamIndex: 0 },
+    ];
+
+    await db.transaction(queryArray, paramsArray, dependencies);
+
+    if (profileId === 2) {
+      const doctor = await db.query("getPersonByDocument", [documentNumber]);
+      await db.query("insertDoctor", [doctor.rows[0].person_id]);
+    }
 
     await session.createSession(req);
-    await session.sessionExist(req);
+
+    const menuData = {
+      methodName: "getMenuItems",
+      objectName: "Menu",
+      params: { userProfile: req.session.profileId },
+    };
+
+    await security.exeMethod(menuData);
 
     res.sendStatus(200);
   } catch (error) {
@@ -85,13 +97,29 @@ app.post("/login", async (req, res) => {
 
   if (!session.sessionExist(req)) {
     const result = await session.createSession(req);
+
     if (result.success) {
-      return res.status(200).json({ token: result.token });
+      return res.status(200).send(result.sessionData);
     } else {
       return res.status(400).send(result.message);
     }
   } else {
     return res.status(400).send("Session already exists");
+  }
+});
+
+app.get("/getMenus", async (req, res) => {
+  try {
+    const menuData = {
+      methodName: "getMenus",
+      objectName: "Menu",
+      params: { userProfile: req.session.profileId },
+    };
+    const menus = await security.exeMethod(menuData);
+    return res.status(200).json({ menus });
+  } catch (error) {
+    console.error("Error fetching menus:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
