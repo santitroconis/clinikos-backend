@@ -20,7 +20,6 @@ class Security {
 
         this.permissionMethod.set(key, true);
       });
-      // console.log(this.permissionMethod);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -51,7 +50,7 @@ class Security {
       }
     } catch (error) {
       console.error("Error executing method:", error);
-      throw error;
+      return { success: false, message: "Internal server error" };
     }
   }
 }

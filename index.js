@@ -155,9 +155,23 @@ app.post("/toProcess", async (req, res) => {
   };
 
   if (security.hasPermission(data)) {
-    security.exeMethod(data);
+    try {
+      const result = await security.exeMethod(data);
+      if (result.success) {
+        return res.status(200).json(result);
+      } else {
+        return res.status(400).json(result);
+      }
+    } catch (error) {
+      console.error("Error executing method:", error);
+      return res
+        .status(500)
+        .json({ success: false, message: "Internal server error" });
+    }
   } else {
-    return res.status(403).send({ msg: "No tiene permiso." });
+    return res
+      .status(403)
+      .json({ success: false, message: "No tiene permiso." });
   }
 });
 

@@ -7,6 +7,10 @@ class Appointment {
         params.document_number,
       ]);
 
+      if (person.rows.length === 0) {
+        return { success: false, message: "Person not found" };
+      }
+
       const result = await db.query("createAppointment", [
         params.hour,
         params.date,
@@ -14,10 +18,14 @@ class Appointment {
         params.department,
       ]);
 
-      console.log(result);
+      if (result.rowCount > 0) {
+        return { success: true, message: "Appointment created successfully" };
+      } else {
+        return { success: false, message: "Failed to create appointment" };
+      }
     } catch (error) {
       console.error("Error:", error);
-      throw error;
+      return { success: false, message: "Internal server error" };
     }
   }
 
