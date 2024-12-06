@@ -110,12 +110,12 @@ app.post("/login", async (req, res) => {
 
 app.get("/getMenus", async (req, res) => {
   try {
-    const menuData = {
+    const data = {
       methodName: "getMenus",
       objectName: "Menu",
       params: { userProfile: req.session.profileId },
     };
-    const menus = await security.exeMethod(menuData);
+    const menus = await security.exeMethod(data);
     return res.status(200).json({ menus });
   } catch (error) {
     console.error("Error fetching menus:", error);

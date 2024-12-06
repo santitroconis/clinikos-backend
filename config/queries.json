@@ -19,5 +19,7 @@
 
   "createAppointment": "insert into appointment (appointment_hour, appointment_date, person_id, department_id) values ($1, $2, $3, $4)",
 
-  "getMenus": "select role, menu_name from permission_menu pm join menu m on pm.menu_id = m.menu_id join profile p on pm.profile_id = p.profile_id where p.profile_id = $1"
+  "getMenus": "select role, menu_name from permission_menu pm join menu m on pm.menu_id = m.menu_id join profile p on pm.profile_id = p.profile_id where p.profile_id = $1",
+
+  "getDoctorPatients": "select * from appointment a join person p on a.person_id = p.person_id where a.doctor_id = $1"
 }
